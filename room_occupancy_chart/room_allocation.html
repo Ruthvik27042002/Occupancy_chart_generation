@@ -24,36 +24,35 @@
                 }
             });
             // Handle form submission
-            $("form").submit(function(event) {
-                event.preventDefault(); // Prevent form from submitting
-                var roomNumber = $("#room").val();
-                var date = $("#date").val();
-                var startTime = $("#start_time").val();
-                var endTime = $("#end_time").val();
-                if (roomNumber == "Please select room") {
-                    alert("Please select a room.");
-                    return;
-                }
-                $.ajax({
-                    url: "check_availability.php",
-                    type: "POST",
-                    data: { room: roomNumber, date: date, start_time: startTime, end_time: endTime },
-                    success: function(result) {
-                        if (result == "available") {
-                            alert("Room is available. You can proceed with booking.");
-                        } else if (result == "unavailable") {
-                            alert("Room is unavailable. Please select another date or room.");
-                        } else {
-                            alert(result);
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
+        $("form").submit(function(event) {
+            event.preventDefault(); // Prevent form from submitting
+            var roomNumber = $("#room").val();
+            var date = $("#date").val();
+            if (roomNumber == "Please select room") {
+                alert("Please select a room.");
+                return;
+            }
+            $.ajax({
+                url: "check_availability.php",
+                type: "POST",
+                data: { room: roomNumber, date: date },
+                success: function(result) {
+                    if (result == "available") {
+                        alert("Room is available. You can proceed with booking.");
+                    } else if (result == "unavailable") {
+                        alert("Room is unavailable. Please select another date or room.");
+                    } else {
                         alert("Failed to check room availability.");
                     }
-                });
+                },
+                error: function() {
+                    alert("Failed to check room availability.");
+                }
             });
+        });
 		});
+
+        
 	</script>
     <style>
         body {
@@ -105,17 +104,9 @@
 		<select name="room" id="room"></select>
 		<br>
 		<label for="date">Select Date:</label>
-		<label for="date">Select Date:</label>
-        <input type="text" name="date" id="date">
-
-        <label for="start_time">Start Time:</label>
-        <input type="text" name="start_time" id="start_time" placeholder="yyyy-mm-dd hh:mm:ss">
-
-        <label for="end_time">End Time:</label>
-        <input type="text" name="end_time" id="end_time" placeholder="yyyy-mm-dd hh:mm:ss">
-
+		<input type="text" name="date" id="date">
 		<br>
-		<input type="submit" value="Check Availability" onclick="check_availability()">
+		<input type="submit" value="Check Availability">
 	</form>
 </body>
 </html>
