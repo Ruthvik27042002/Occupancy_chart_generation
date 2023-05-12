@@ -3,11 +3,25 @@
 <head>
 	<title>Room Booking</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.2.17/jquery.timepicker.min.css">
 	<script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="//code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.2.17/jquery.timepicker.min.js"></script>
 	<script>
 		$(function() {
 			$("#date").datepicker();
+			// Initialize timepicker plugin
+			$('.timepicker').timepicker({
+				timeFormat: 'hh:mm:ss',
+				interval: 30,
+				minTime: '00:00:00',
+				maxTime: '11:59:59pm',
+				defaultTime: 'now',
+				startTime: '00:00',
+				dynamic: false,
+				dropdown: true,
+				scrollbar: true
+			});
             // Retrieve room allocation data using AJAX
             $.ajax({
                 url: "get_rooms.php",
@@ -24,35 +38,36 @@
                 }
             });
             // Handle form submission
-        $("form").submit(function(event) {
-            event.preventDefault(); // Prevent form from submitting
-            var roomNumber = $("#room").val();
-            var date = $("#date").val();
-            if (roomNumber == "Please select room") {
-                alert("Please select a room.");
-                return;
-            }
-            $.ajax({
-                url: "check_availability.php",
-                type: "POST",
-                data: { room: roomNumber, date: date },
-                success: function(result) {
-                    if (result == "available") {
-                        alert("Room is available. You can proceed with booking.");
-                    } else if (result == "unavailable") {
-                        alert("Room is unavailable. Please select another date or room.");
-                    } else {
+            $("form").submit(function(event) {
+                event.preventDefault(); // Prevent form from submitting
+                var roomNumber = $("#room").val();
+                var date = $("#date").val();
+                var startTime = $("#start_time").val();
+                var endTime = $("#end_time").val();
+                if (roomNumber == "Please select room") {
+                    alert("Please select a room.");
+                    return;
+                }
+                $.ajax({
+                    url: "check_availability.php",
+                    type: "POST",
+                    data: { room: roomNumber, date: date, start_time: startTime, end_time: endTime },
+                    success: function(result) {
+                        if (result == "available") {
+                            alert("Room is available. You can proceed with booking.");
+                        } else if (result == "unavailable") {
+                            alert("Room is unavailable. Please select another date or room.");
+                        } else {
+                            alert(result);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
                         alert("Failed to check room availability.");
                     }
-                },
-                error: function() {
-                    alert("Failed to check room availability.");
-                }
+                });
             });
-        });
 		});
-
-        
 	</script>
     <style>
         body {
@@ -98,15 +113,21 @@
     
 </head>
 <body>
-	<h1>Room Booking</h1>
+	<h1>Room Availability</h1>
 	<form method="post" action="check_availability.php">
 		<label for="room">Select Room:</label>
 		<select name="room" id="room"></select>
 		<br>
 		<label for="date">Select Date:</label>
-		<input type="text" name="date" id="date">
+        <input type="text" name="date" id="date">
+        
+		<label for="time">Select Time:</label>
+        <input type="text" name="start_time" id="start_time" placeholder="hh:mm:ss" class="custom-timepicker">
+        <input type="text" name="end_time" id="end_time" placeholder="hh:mm:ss" class="custom-timepicker">
+
+
 		<br>
-		<input type="submit" value="Check Availability">
+		<input type="submit" value="Check Availability" onclick="check_availability()">
 	</form>
 </body>
 </html>
