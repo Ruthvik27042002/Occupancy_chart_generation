@@ -23,6 +23,10 @@
     <link type="text/css" rel="stylesheet" href="icons/style.css" />
 
     <style type="text/css">
+        div[style="position: absolute; padding: 2px; top: 0px; left: 1px; background-color: rgb(255, 102, 0); color: white;"] {
+        display: none;
+        }
+
         select {
             padding: 5px;
         }
@@ -161,6 +165,7 @@
 </script>
 
 <script>
+    
     const dp = new DayPilot.Scheduler("dp");
 
     dp.allowEventOverlap = false;
