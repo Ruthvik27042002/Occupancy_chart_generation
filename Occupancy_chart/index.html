@@ -117,8 +117,8 @@
             <select id="filter">
                 <option value="0">All</option>
                 <option value="1">Single</option>
-                <option value="2">Double</option>
-                <option value="4">Family</option>
+                <option value="2">Seminar</option>
+                <option value="4">Hall</option>
             </select>
 
             &nbsp;&nbsp;
@@ -127,17 +127,18 @@
 
             <div class="toolbar-separator"></div>
 
-            Time range:
-            <select id="timerange">
-                <option value="week">Week</option>
+            <!-- Time range: -->
+            <select id="timerange" style="display: none;">
+                <option value="week" selected>Week</option>
                 <option value="month" selected>Month</option>
             </select>
-            <div class="toolbar-separator"></div>
+            <!-- <div class="toolbar-separator"></div> -->
             <label for="autocellwidth"><input type="checkbox" id="autocellwidth">Auto Cell Width</label>
 
         </div>
 
         <div id="dp"></div>
+        
 
     </div>
 
@@ -145,13 +146,15 @@
 
 <script type="text/javascript">
     const nav = new DayPilot.Navigator("nav");
-    nav.selectMode = "month";
+    nav.selectMode = "day";
     nav.showMonths = 3;
     nav.skipMonths = 3;
     nav.onTimeRangeSelected = function(args) {
-        loadTimeline(args.start);
+        // loadTimeline(args.start);
+        // dp.update();
+        // loadReservations();
+        dp.startDate = args.start;
         dp.update();
-        loadReservations();
     };
     nav.init();
 
@@ -162,14 +165,13 @@
 
     dp.allowEventOverlap = false;
 
-    dp.days = dp.startDate.daysInMonth();
-    loadTimeline(DayPilot.Date.today().firstDayOfMonth());
+    dp.days = 1;
 
     dp.eventDeleteHandling = "Update";
 
     dp.timeHeaders = [
-        { groupBy: "Month", format: "MMMM yyyy" },
-        { groupBy: "Day", format: "d" }
+        { groupBy: "Day", format: "d" },
+        { groupBy: "Hour"}
     ];
 
     dp.eventHeight = 80;
@@ -229,7 +231,7 @@
 
     dp.onBeforeRowHeaderRender = (args) => {
         const beds = (count) => {
-            return count + " bed" + (count > 1 ? "s" : "");
+            return count + " person" + (count > 1 ? "s" : "");
         };
 
         args.row.columns[1].html = beds(args.row.data.capacity);
@@ -470,18 +472,21 @@
     });
 
     elements.timerange.addEventListener("change", () => {
-        switch (this.value) {
-            case "week":
-                dp.days = 7;
-                nav.selectMode = "Week";
-                nav.select(nav.selectionDay);
-                break;
-            case "month":
-                dp.days = dp.startDate.daysInMonth();
-                nav.selectMode = "Month";
-                nav.select(nav.selectionDay);
-                break;
-        }
+        // switch (this.value) {
+        //     case "week":
+        //         dp.days = 7;
+        //         nav.selectMode = "Week";
+        //         nav.select(nav.selectionDay);
+        //         break;
+        //     case "month":
+        //         dp.days = dp.startDate.daysInMonth();
+        //         nav.selectMode = "Month";
+        //         nav.select(nav.selectionDay);
+        //         break;
+        // }
+        dp.days = 1;
+        nav.selectMode = "Day";
+        nav.select(nav.selectionDay);
     });
 
     elements.autocellwidth.addEventListener("click", () => {
