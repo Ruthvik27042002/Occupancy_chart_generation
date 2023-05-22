@@ -36,13 +36,16 @@ if (!$exists) {
                         status VARCHAR(30))");
 
     $db->exec("CREATE TABLE IF NOT EXISTS reservations (
-                        id INTEGER PRIMARY KEY AUTO_INCREMENT,
-                        name TEXT,
-                        start DATETIME,
-                        end DATETIME,
-                        room_id INTEGER,
-                        status VARCHAR(30),
-                        paid INTEGER)");
+        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+        name TEXT,
+        start DATETIME,
+        end DATETIME,
+        room_id INTEGER,
+        status VARCHAR(30),
+        login_details_id INTEGER,
+        FOREIGN KEY (login_details_id) REFERENCES login_details(id)
+        )");
+
 
     $rooms = array(
                     array('name' => 'Room 1',

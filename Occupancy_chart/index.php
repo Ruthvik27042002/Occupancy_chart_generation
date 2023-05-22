@@ -1,9 +1,21 @@
+<?php
+session_start();
+
+// Check if the user is logged in and has the admin role
+if(isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin") {
+    $showAddRoomButton = true;
+} else {
+    $showAddRoomButton = false;
+}
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PHP Hotel Room Booking (JavaScript/HTML5, MySQL)</title>
+    <title>ROOM ALLOCATION</title>
 
     <style type="text/css">
         p, body, td, input, select, button { font-family: -apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; font-size: 14px; }
@@ -102,12 +114,20 @@
         }
 
     </style>
-
+    <script>
+        // JavaScript code
+        window.onload = function() {
+            <?php if ($removeContextMenu): ?>
+            // Remove contextMenuResource
+            dp.contextMenuResource = null;
+            
+            <?php endif; ?>
+        }
+    </script>
 </head>
 <body>
-<div class="header">
+    <?php include 'header.php'; ?>
 </div>
-
 <div class="main">
     <div style="width:220px; float:left;">
         <div id="nav"></div>
@@ -127,7 +147,9 @@
 
             &nbsp;&nbsp;
 
-            <button id="addroom">Add Room</button>
+            <?php if($showAddRoomButton): ?>
+                <button id="addroom">Add Room</button>
+            <?php endif; ?>
 
             <div class="toolbar-separator"></div>
 
@@ -167,6 +189,8 @@
 <script>
     
     const dp = new DayPilot.Scheduler("dp");
+    
+
 
     dp.allowEventOverlap = false;
 
@@ -287,10 +311,13 @@
         dp.message("Deleted.");
     };
 
+
     // event creating
     // http://api.daypilot.org/daypilot-scheduler-ontimerangeselected/
     dp.onTimeRangeSelected = async (args) => {
-
+        // if (isAdmin()) {
+        //     return;
+        // }
         const rooms = dp.resources.map((item) => {
             return {
                 name: item.name,
@@ -322,13 +349,15 @@
         const {data: result} = await DayPilot.Http.post("backend_reservation_create.php", e);
 
         e.id = result.id;
-        e.paid = result.paid;
         e.status = result.status;
         dp.events.add(e);
 
     };
 
     dp.onEventClick = async (args) => {
+        // if (isAdmin()) {
+        //     return;
+        // }
         const rooms = dp.resources.map((item) => {
             return {
                 name: item.name,
@@ -343,11 +372,6 @@
             {name: "CheckedOut", id: "CheckedOut"}
         ];
 
-        const paidoptions = [
-            {name: "0%", id: 0},
-            {name: "50%", id: 50},
-            {name: "100%", id: 100},
-        ]
 
         const form = [
             {name: "Text", id: "text"},
@@ -355,11 +379,11 @@
             {name: "End", id: "end", dateFormat: "MM/dd/yyyy h:mm tt"},
             {name: "Room", id: "resource", options: rooms},
             {name: "Status", id: "status", options: statuses},
-            {name: "Paid", id: "paid", options: paidoptions},
+            // {name: "Paid", id: "paid", options: paidoptions},
         ];
 
         const data = args.e.data;
-
+        
         const modal = await DayPilot.Modal.form(form, data);
 
         dp.clearSelection();
@@ -370,6 +394,7 @@
         await DayPilot.Http.post("backend_reservation_update.php", e);
         dp.events.update(e);
     };
+
 
     dp.onBeforeEventRender = (args) => {
         const start = new DayPilot.Date(args.data.start);
@@ -429,15 +454,20 @@
 
         args.data.html = "<div>" + args.data.html + "<br /><span style='color:gray'>" + args.data.toolTip + "</span></div>";
 
-        const paid = args.data.paid;
-        const paidColor = "#aaaaaa";
+        // const paid = args.data.paid;
+        // const paidColor = "#aaaaaa";
 
-        args.data.areas = [
-            { bottom: 10, right: 4, html: "<div style='color:" + paidColor + "; font-size: 8pt;'>Paid: " + paid + "%</div>", v: "Visible"},
-            { left: 4, bottom: 8, right: 4, height: 2, html: "<div style='background-color:" + paidColor + "; height: 100%; width:" + paid + "%'></div>", v: "Visible" }
-        ];
+        // args.data.areas = [
+        //     { bottom: 10, right: 4, html: "<div style='color:" + paidColor + "; font-size: 8pt;'>Paid: " + paid + "%</div>", v: "Visible"},
+        //     { left: 4, bottom: 8, right: 4, height: 2, html: "<div style='background-color:" + paidColor + "; height: 100%; width:" + paid + "%'></div>", v: "Visible" }
+        // ];
 
     };
+
+    function isAdmin() {
+        // Check if the user role is "admin" in the session variable
+        return "<?php echo $_SESSION['user_role']; ?>" === "admin";
+    }
 
 
     dp.init();

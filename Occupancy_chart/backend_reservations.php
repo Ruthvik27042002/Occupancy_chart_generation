@@ -4,9 +4,9 @@ require_once '_db.php';
 $start = $_GET['start'];
 $end = $_GET['end'];
 
-$stmt = $db->prepare("SELECT * FROM reservations WHERE NOT ((end <= :start) OR (start >= :end))");
-$stmt->bindParam(':start', $start);
-$stmt->bindParam(':end', $end);
+$stmt = $db->prepare("SELECT * FROM reservations WHERE 1");
+// $stmt->bindParam(':start', $start);
+// $stmt->bindParam(':end', $end);
 $stmt->execute();
 $result = $stmt->fetchAll();
 
@@ -28,9 +28,10 @@ foreach($result as $row) {
     
     // additional properties
     $e->status = $row['status'];
-    $e->paid = intval($row['paid']);
+    $e->login_details_id = $row['login_details_id'];
     $events[] = $e;
 }
 
 header('Content-Type: application/json');
 echo json_encode($events);
+?>
